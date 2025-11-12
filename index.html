@@ -7,21 +7,505 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Load React and ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Load Babel to transpile JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
-  }
-}
-</script>
-</head>
+    
+    <!-- Load Google GenAI SDK and attach to window -->
+    <script type="module">
+      import { GoogleGenAI } from "https://aistudiocdn.com/@google/genai@^1.29.0";
+      window.GoogleGenAI = GoogleGenAI;
+    </script>
+  </head>
   <body class="bg-slate-900">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script type="text/babel" data-type="module" src="index.jsx"></script>
+    <!-- Our entire application code, transpiled by Babel -->
+    <script type="text/babel" data-presets="react">
+      // All application code is consolidated into this single file
+      // to avoid module loading issues on static hosting.
+
+      // --- Game Constants ---
+      const Role = {
+        FAITHFUL: 'FAITHFUL',
+        TRAITOR: 'TRAITOR',
+      };
+
+      const GameStage = {
+        SETUP: 'SETUP',
+        REVEALING: 'REVEALING',
+        DISCUSSION: 'DISCUSSION',
+        END: 'END',
+      };
+
+
+      // --- Gemini Service ---
+      const fetchSecretWord = (() => {
+        const API_KEY = process.env.API_KEY;
+
+        if (!API_KEY) {
+          console.warn("API_KEY environment variable not set. Gemini features will be disabled.");
+        }
+        
+        // Access the GenAI SDK from the window object where it was placed by index.html
+        const ai = (API_KEY && window.GoogleGenAI) ? new window.GoogleGenAI({ apiKey: API_KEY }) : null;
+
+        const fallbackWords = ['house', 'star', 'boat', 'bridge', 'flower', 'pencil', 'river', 'cloud', 'shoe', 'door'];
+        const getRandomFallback = () => fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+
+        return async () => {
+          if (!ai) {
+            console.log("Using fallback word due to missing API key.");
+            return getRandomFallback();
+          }
+          
+          try {
+            const response = await ai.models.generateContent({
+              model: 'gemini-2.5-flash',
+              contents: 'Generate a single, common, and simple noun for a social deduction game. The word should be easy for most people to describe. Examples: "apple", "chair", "moon", "key". Return only the single word in lowercase. Do not add any punctuation, explanation, or extra text.',
+            });
+            
+            const word = response.text.trim().toLowerCase();
+            
+            if (word && !/\s/.test(word) && /^[a-z]+$/.test(word)) {
+              return word;
+            }
+            
+            console.warn("Gemini returned an invalid format, using fallback word.");
+            return getRandomFallback();
+          } catch (error) {
+            console.error("Error fetching secret word from Gemini:", error);
+            return getRandomFallback();
+          }
+        };
+      })();
+
+
+      // --- Icon Components ---
+      const PlayerIcon = ({ className = "w-16 h-16" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className={className}
+        >
+          <path
+            fillRule="evenodd"
+            d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+            clipRule="evenodd"
+          />
+        </svg>
+      );
+
+      const FaithfulIcon = ({ className = "w-16 h-16" }) => (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 24 24" 
+          fill="currentColor" 
+          className={className}
+        >
+          <path 
+            fillRule="evenodd" 
+            d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" 
+            clipRule="evenodd" 
+          />
+        </svg>
+      );
+
+      const TraitorIcon = ({ className = "w-16 h-16" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className={className}
+        >
+          <path d="M12.0003 2.00012C17.5231 2.00012 22.0003 6.47727 22.0003 12.0001C22.0003 17.523 17.5231 22.0001 12.0003 22.0001C6.47746 22.0001 2.00031 17.523 2.00031 12.0001C2.00031 6.47727 6.47746 2.00012 12.0003 2.00012ZM12.0003 20.0001C16.4194 20.0001 20.0003 16.4193 20.0003 12.0001C20.0003 7.581 16.4194 4.00012 12.0003 4.00012C7.58125 4.00012 4.00031 7.581 4.00031 12.0001C4.00031 16.4193 7.58125 20.0001 12.0003 20.0001ZM15.0003 14.0001H9.00031V16.0001H15.0003V14.0001ZM15.5003 8.00012C14.6719 8.00012 14.0003 8.67169 14.0003 9.50012V11.5001C14.0003 12.3285 14.6719 13.0001 15.5003 13.0001C16.3287 13.0001 17.0003 12.3285 17.0003 11.5001V9.50012C17.0003 8.67169 16.3287 8.00012 15.5003 8.00012ZM8.50031 8.00012C7.67188 8.00012 7.00031 8.67169 7.00031 9.50012V11.5001C7.00031 12.3285 7.67188 13.0001 8.50031 13.0001C9.32873 13.0001 10.0003 12.3285 10.0003 11.5001V9.50012C10.0003 8.67169 9.32873 8.00012 8.50031 8.00012Z"></path>
+        </svg>
+      );
+
+
+      // --- Screen Components ---
+      const SetupScreen = ({
+        playerCount,
+        setPlayerCount,
+        traitorCount,
+        setTraitorCount,
+        onStart,
+        isLoading,
+        error,
+      }) => {
+        const handlePlayerChange = (e) => {
+          let value = parseInt(e.target.value) || 3;
+          if (value < 3) value = 3;
+          setPlayerCount(value);
+          if (traitorCount >= value) {
+            setTraitorCount(value - 1);
+          }
+        };
+
+        const handleTraitorChange = (e) => {
+          let value = parseInt(e.target.value) || 1;
+          if (value < 1) value = 1;
+          if (value > 3) value = 3;
+          if (value >= playerCount) value = playerCount - 1;
+          setTraitorCount(value);
+        };
+
+        return (
+          <div className="w-full max-w-md mx-auto p-8 bg-slate-800 rounded-2xl shadow-2xl flex flex-col items-center text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500 mb-2">
+              Traitors
+            </h1>
+            <p className="text-slate-400 mb-8">Uncover the traitors among you.</p>
+
+            <div className="w-full space-y-6 mb-8">
+              <div className="flex flex-col items-start">
+                <label htmlFor="players" className="text-lg font-medium text-slate-200 mb-2">
+                  Number of Players
+                </label>
+                <input
+                  id="players"
+                  type="number"
+                  min="3"
+                  value={playerCount}
+                  onChange={handlePlayerChange}
+                  className="w-full bg-slate-700 text-white p-3 rounded-lg border-2 border-slate-600 focus:border-cyan-500 focus:ring-cyan-500 transition"
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="flex flex-col items-start">
+                <label htmlFor="traitors" className="text-lg font-medium text-slate-200 mb-2">
+                  Number of Traitors
+                </label>
+                <input
+                  id="traitors"
+                  type="number"
+                  min="1"
+                  max="3"
+                  value={traitorCount}
+                  onChange={handleTraitorChange}
+                  className="w-full bg-slate-700 text-white p-3 rounded-lg border-2 border-slate-600 focus:border-cyan-500 focus:ring-cyan-500 transition"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+            
+            {error && <p className="text-red-400 mb-4">{error}</p>}
+
+            <button
+              onClick={onStart}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 text-white font-bold py-4 px-4 rounded-lg text-xl hover:from-cyan-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+            >
+              {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Starting Game...
+                  </>
+              ) : (
+                'Start Game'
+              )}
+            </button>
+          </div>
+        );
+      };
+
+      const RevealScreen = ({ currentPlayer, secretWord, onNextPlayer }) => {
+        const [isRevealed, setIsRevealed] = React.useState(false);
+        const [isMasked, setIsMasked] = React.useState(true);
+
+        React.useEffect(() => {
+          setIsRevealed(false);
+          setIsMasked(true);
+        }, [currentPlayer]);
+
+        const handleReveal = () => {
+          setIsMasked(false);
+          setTimeout(() => setIsRevealed(true), 100);
+        };
+        
+        const handleNext = () => {
+          setIsRevealed(false);
+          setTimeout(() => {
+            onNextPlayer();
+          }, 500);
+        };
+
+        const isTraitor = currentPlayer.role === Role.TRAITOR;
+
+        return (
+          <div className="w-full max-w-md mx-auto p-4 sm:p-8 flex flex-col items-center justify-center text-center h-full">
+            <div 
+              className={`relative w-full aspect-square flex flex-col items-center justify-center p-6 rounded-3xl shadow-2xl transition-all duration-500 ${
+                isRevealed 
+                  ? (isTraitor ? 'bg-red-900/50 border-red-500' : 'bg-sky-900/50 border-sky-500') 
+                  : 'bg-slate-800 border-slate-700'
+              } border-2`}
+            >
+              <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 ${isMasked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                  <PlayerIcon className="w-24 h-24 text-slate-500" />
+                  <h2 className="text-4xl font-bold text-slate-200 mt-4">Player {currentPlayer.id}</h2>
+                  <p className="text-slate-400 mt-2">It's your turn.</p>
+              </div>
+
+              <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 ${isRevealed ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                  {isTraitor ? (
+                      <TraitorIcon className="w-24 h-24 text-red-400" />
+                  ) : (
+                      <FaithfulIcon className="w-24 h-24 text-sky-400" />
+                  )}
+                  <h2 className={`text-5xl font-bold mt-4 ${isTraitor ? 'text-red-300' : 'text-sky-300'}`}>
+                      You are a {isTraitor ? 'TRAITOR' : 'FAITHFUL'}
+                  </h2>
+                  {!isTraitor && (
+                      <>
+                          <p className="text-slate-300 mt-4 text-xl">The secret word is:</p>
+                          <p className="text-4xl font-bold text-white tracking-widest uppercase bg-slate-700/50 px-4 py-2 rounded-lg mt-2">{secretWord}</p>
+                      </>
+                  )}
+              </div>
+            </div>
+            
+            <div className="w-full mt-8">
+              {isRevealed ? (
+                  <button
+                      onClick={handleNext}
+                      className="w-full bg-slate-600 text-white font-bold py-4 px-4 rounded-lg text-xl hover:bg-slate-500 transition-all duration-300 transform hover:scale-105"
+                  >
+                      Hide & Pass
+                  </button>
+              ) : (
+                  <button
+                      onClick={handleReveal}
+                      className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 text-white font-bold py-4 px-4 rounded-lg text-xl hover:from-cyan-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105"
+                  >
+                      Tap to Reveal Role
+                  </button>
+              )}
+            </div>
+          </div>
+        );
+      };
+
+      const DiscussionScreen = ({ onRevealTraitors, startingPlayer }) => {
+        return (
+          <div className="w-full max-w-md mx-auto p-8 bg-slate-800 rounded-2xl shadow-2xl flex flex-col items-center text-center">
+            <PlayerIcon className="w-24 h-24 text-teal-400" />
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-100 mt-6 mb-4">
+              All Roles Revealed
+            </h1>
+            <p className="text-slate-300 text-lg mb-2">
+              Discuss, deceive, and deduce to find the traitors.
+            </p>
+            <p className="text-cyan-400 font-bold text-2xl mb-8">
+              Player {startingPlayer} starts.
+            </p>
+
+            <button
+              onClick={onRevealTraitors}
+              className="w-full bg-gradient-to-r from-red-500 to-orange-600 text-white font-bold py-4 px-4 rounded-lg text-xl hover:from-red-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105"
+            >
+              Reveal Traitors
+            </button>
+          </div>
+        );
+      };
+
+      const EndScreen = ({ players, onNewGame }) => {
+        const traitors = players.filter(p => p.role === Role.TRAITOR);
+
+        return (
+          <div className="w-full max-w-md mx-auto p-8 bg-slate-800 rounded-2xl shadow-2xl flex flex-col items-center text-center">
+            <TraitorIcon className="w-24 h-24 text-red-400" />
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-100 mt-6 mb-4">
+              Game Over
+            </h1>
+
+            <div className="mb-8 w-full">
+              <h2 className="text-2xl text-red-300 font-semibold mb-3">
+                {traitors.length > 1 ? 'The Traitors Were' : 'The Traitor Was'}
+              </h2>
+              <div className="flex flex-wrap justify-center gap-4">
+                {traitors.map(traitor => (
+                  <div key={traitor.id} className="bg-red-900/50 border-2 border-red-500 rounded-lg px-6 py-3">
+                    <p className="text-xl font-bold text-white">Player {traitor.id}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={onNewGame}
+              className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 text-white font-bold py-4 px-4 rounded-lg text-xl hover:from-cyan-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105"
+            >
+              Play Again
+            </button>
+          </div>
+        );
+      };
+
+
+      // --- Main App Component ---
+      const App = () => {
+        const { useState, useEffect } = React;
+        
+        const getInitialState = (key, defaultValue) => {
+            try {
+                const storedValue = localStorage.getItem(key);
+                return storedValue ? JSON.parse(storedValue) : defaultValue;
+            } catch (error) {
+                console.warn(`Error reading localStorage key "${key}":`, error);
+                return defaultValue;
+            }
+        };
+
+        const [gameStage, setGameStage] = useState(GameStage.SETUP);
+        const [playerCount, setPlayerCount] = useState(() => getInitialState('playerCount', 3));
+        const [traitorCount, setTraitorCount] = useState(() => getInitialState('traitorCount', 1));
+        const [players, setPlayers] = useState([]);
+        const [secretWord, setSecretWord] = useState('');
+        const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+        const [startingPlayer, setStartingPlayer] = useState(null);
+        const [isLoading, setIsLoading] = useState(false);
+        const [error, setError] = useState(null);
+
+        useEffect(() => {
+            localStorage.setItem('playerCount', JSON.stringify(playerCount));
+        }, [playerCount]);
+
+        useEffect(() => {
+            localStorage.setItem('traitorCount', JSON.stringify(traitorCount));
+        }, [traitorCount]);
+
+        const shuffleArray = (array) => {
+          const newArray = [...array];
+          for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+          }
+          return newArray;
+        };
+
+        const handleStartGame = async () => {
+          setIsLoading(true);
+          setError(null);
+
+          if (traitorCount >= playerCount) {
+              setError("There must be fewer traitors than players.");
+              setIsLoading(false);
+              return;
+          }
+
+          try {
+            const word = await fetchSecretWord();
+            setSecretWord(word);
+
+            const roles = Array(traitorCount).fill(Role.TRAITOR)
+              .concat(Array(playerCount - traitorCount).fill(Role.FAITHFUL));
+            const shuffledRoles = shuffleArray(roles);
+
+            const newPlayers = shuffledRoles.map((role, index) => ({
+              id: index + 1,
+              role,
+            }));
+            
+            setPlayers(newPlayers);
+            setCurrentPlayerIndex(0);
+            setGameStage(GameStage.REVEALING);
+          } catch (e) {
+            setError('Failed to start the game. Please try again.');
+            console.error(e);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+
+        const handleNextPlayer = () => {
+          if (currentPlayerIndex < players.length - 1) {
+            setCurrentPlayerIndex(prev => prev + 1);
+          } else {
+            const startPlayerId = Math.floor(Math.random() * players.length) + 1;
+            setStartingPlayer(startPlayerId);
+            setGameStage(GameStage.DISCUSSION);
+          }
+        };
+        
+        const handleRevealTraitors = () => {
+          setGameStage(GameStage.END);
+        };
+
+        const handleNewGame = () => {
+          setGameStage(GameStage.SETUP);
+          setPlayers([]);
+          setSecretWord('');
+          setCurrentPlayerIndex(0);
+          setStartingPlayer(null);
+          setError(null);
+        };
+
+        const renderGameStage = () => {
+          switch (gameStage) {
+            case GameStage.REVEALING:
+              return (
+                <RevealScreen
+                  currentPlayer={players[currentPlayerIndex]}
+                  secretWord={secretWord}
+                  onNextPlayer={handleNextPlayer}
+                />
+              );
+            case GameStage.DISCUSSION:
+              return (
+                <DiscussionScreen
+                  startingPlayer={startingPlayer}
+                  onRevealTraitors={handleRevealTraitors}
+                />
+              );
+            case GameStage.END:
+              return <EndScreen players={players} onNewGame={handleNewGame} />;
+            case GameStage.SETUP:
+            default:
+              return (
+                <SetupScreen
+                  playerCount={playerCount}
+                  setPlayerCount={setPlayerCount}
+                  traitorCount={traitorCount}
+                  setTraitorCount={setTraitorCount}
+                  onStart={handleStartGame}
+                  isLoading={isLoading}
+                  error={error}
+                />
+              );
+          }
+        };
+
+        return (
+          <main className="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 font-sans">
+            <div className="w-full h-full flex items-center justify-center">
+              {renderGameStage()}
+            </div>
+          </main>
+        );
+      };
+
+
+      // --- Mount the App ---
+      const rootElement = document.getElementById('root');
+      if (!rootElement) {
+        throw new Error("Could not find root element to mount to");
+      }
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    </script>
   </body>
 </html>
