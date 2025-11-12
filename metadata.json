@@ -1,0 +1,5 @@
+{
+  "name": "Traitors",
+  "description": "A social deduction game where faithful players must identify the hidden traitors. The app assigns roles and provides a secret word to the faithful, then players must discuss and vote to find the traitors among them.",
+  "requestFramePermissions": []
+}
