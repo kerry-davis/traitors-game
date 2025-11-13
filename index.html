@@ -184,7 +184,19 @@
           if (currentPlayerIndex < numPlayers - 1) {
             setCurrentPlayerIndex(currentPlayerIndex + 1);
           } else {
-            const firstPlayer = Math.floor(Math.random() * numPlayers) + 1;
+            const faithfulIndices = playerRoles
+              .map((role, index) => (role === Role.FAITHFUL ? index : -1))
+              .filter(index => index !== -1);
+            
+            let firstPlayer;
+            if (faithfulIndices.length > 0) {
+              const randomFaithfulIndex = faithfulIndices[Math.floor(Math.random() * faithfulIndices.length)];
+              firstPlayer = randomFaithfulIndex + 1;
+            } else {
+              // Fallback in case there are no faithful players (should not happen with validation)
+              firstPlayer = Math.floor(Math.random() * numPlayers) + 1;
+            }
+            
             setStartingPlayer(firstPlayer);
             setGameStage(GameStage.DISCUSSION);
           }
