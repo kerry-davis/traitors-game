@@ -43,6 +43,62 @@
         END: 'END',
       };
 
+      const Theme = {
+        DARK: 'dark',
+        LIGHT: 'light',
+      };
+
+      const themeConfig = {
+        [Theme.DARK]: {
+          bodyClasses: ['bg-slate-900', 'text-white'],
+          mainText: 'text-white',
+          cardBg: 'bg-slate-800',
+          cardText: 'text-white',
+          subtleText: 'text-slate-400',
+          input: 'bg-slate-700 text-white border border-transparent',
+          primaryButton: 'bg-indigo-600 hover:bg-indigo-500 text-white',
+          disabledButton: 'bg-slate-600 text-slate-400 cursor-not-allowed',
+          secondaryButton: 'bg-white/20 hover:bg-white/30 text-white',
+          iconPrimary: 'text-slate-400',
+          faithfulWordBg: 'bg-slate-700',
+          discussionSubtle: 'text-slate-300',
+          discussionHighlight: 'text-indigo-400',
+          traitorScreenBg: 'bg-rose-900 animate-pulse-red-dark',
+          traitorScreenText: 'text-rose-200',
+          traitorIcon: 'text-rose-300',
+          faithfulScreenBg: 'bg-slate-800',
+          faithfulScreenText: 'text-slate-200',
+          faithfulIcon: 'text-slate-400',
+          toggleButton: 'bg-slate-700 hover:bg-slate-600 text-white',
+          toggleFocus: 'focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-900',
+          mainBackground: 'bg-slate-900',
+        },
+        [Theme.LIGHT]: {
+          bodyClasses: ['bg-slate-100', 'text-slate-900'],
+          mainText: 'text-slate-900',
+          cardBg: 'bg-white',
+          cardText: 'text-slate-900',
+          subtleText: 'text-slate-600',
+          input: 'bg-slate-100 text-slate-900 border border-slate-300',
+          primaryButton: 'bg-indigo-600 hover:bg-indigo-500 text-white',
+          disabledButton: 'bg-slate-300 text-slate-500 cursor-not-allowed',
+          secondaryButton: 'bg-slate-900/10 hover:bg-slate-900/20 text-slate-900',
+          iconPrimary: 'text-slate-500',
+          faithfulWordBg: 'bg-slate-200',
+          discussionSubtle: 'text-slate-600',
+          discussionHighlight: 'text-indigo-600',
+          traitorScreenBg: 'bg-rose-100 animate-pulse-red-light',
+          traitorScreenText: 'text-rose-900',
+          traitorIcon: 'text-rose-600',
+          faithfulScreenBg: 'bg-white',
+          faithfulScreenText: 'text-slate-800',
+          faithfulIcon: 'text-slate-500',
+          toggleButton: 'bg-slate-200 hover:bg-slate-300 text-slate-900',
+          toggleFocus: 'focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-100',
+          mainBackground: 'bg-slate-100',
+        },
+      };
+
       const getRandomInt = (max) => {
         if (max <= 0) return 0;
         if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
@@ -92,7 +148,20 @@
       );
       
       // --- Main Application Component ---
+      const THEME_STORAGE_KEY = 'traitors-theme';
+
       const App = () => {
+        const [theme, setTheme] = useState(() => {
+          try {
+            const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+            return storedTheme === Theme.LIGHT ? Theme.LIGHT : Theme.DARK;
+          } catch (error) {
+            return Theme.DARK;
+          }
+        });
+
+        const themeStyles = themeConfig[theme];
+
         const [gameStage, setGameStage] = useState(GameStage.SETUP);
         const [numPlayers, setNumPlayers] = useState(() => parseInt(localStorage.getItem('numPlayers') || '3', 10));
         const [numTraitors, setNumTraitors] = useState(() => parseInt(localStorage.getItem('numTraitors') || '1', 10));
@@ -105,6 +174,27 @@
         const [playerInput, setPlayerInput] = useState(numPlayers.toString());
         const [traitorInput, setTraitorInput] = useState(numTraitors.toString());
         const [error, setError] = useState('');
+
+        useEffect(() => {
+          try {
+            localStorage.setItem(THEME_STORAGE_KEY, theme);
+          } catch (error) {
+            // ignored
+          }
+
+          const classList = document.body.classList;
+          const classesToRemove = new Set();
+          Object.values(themeConfig).forEach(config => {
+            config.bodyClasses.forEach(cls => classesToRemove.add(cls));
+          });
+          classesToRemove.forEach(cls => classList.remove(cls));
+          themeStyles.bodyClasses.forEach(cls => classList.add(cls));
+          document.body.setAttribute('data-theme', theme);
+          document.documentElement.setAttribute('data-theme', theme);
+          if (window.matchMedia) {
+            document.documentElement.style.colorScheme = theme === Theme.DARK ? 'dark' : 'light';
+          }
+        }, [theme, themeStyles]);
 
         useEffect(() => {
           localStorage.setItem('numPlayers', numPlayers.toString());
@@ -129,6 +219,10 @@
             setNumTraitors(traitors);
           }
         }, [playerInput, traitorInput]);
+
+        const toggleTheme = () => {
+          setTheme(prevTheme => (prevTheme === Theme.DARK ? Theme.LIGHT : Theme.DARK));
+        };
 
 
         const handleStartGame = async () => {
@@ -194,55 +288,76 @@
                   setTraitorInput={setTraitorInput}
                   onStartGame={handleStartGame}
                   error={error}
+                  themeStyles={themeStyles}
                 />
               );
             case GameStage.REVEALING:
-              return ( <RevealScreen currentPlayerIndex={currentPlayerIndex} playerRole={playerRoles[currentPlayerIndex]} secretWord={secretWord} onNext={handleRevealNext} totalPlayers={numPlayers} /> );
+              return (
+                <RevealScreen
+                  currentPlayerIndex={currentPlayerIndex}
+                  playerRole={playerRoles[currentPlayerIndex]}
+                  secretWord={secretWord}
+                  onNext={handleRevealNext}
+                  totalPlayers={numPlayers}
+                  themeStyles={themeStyles}
+                />
+              );
             case GameStage.DISCUSSION:
-              return ( <DiscussionScreen onRevealTraitors={handleRevealTraitors} startingPlayer={startingPlayer} /> );
+              return (
+                <DiscussionScreen
+                  onRevealTraitors={handleRevealTraitors}
+                  startingPlayer={startingPlayer}
+                  themeStyles={themeStyles}
+                />
+              );
             case GameStage.END:
-                return ( <EndScreen playerRoles={playerRoles} onPlayAgain={handlePlayAgain} /> );
+                return ( <EndScreen playerRoles={playerRoles} onPlayAgain={handlePlayAgain} themeStyles={themeStyles} /> );
             default:
               return <div>Error: Unknown game stage.</div>;
           }
         };
 
         return (
-          <main className="min-h-screen flex items-center justify-center p-4">
-            {renderGameStage()}
-          </main>
+          <>
+            <ThemeToggle theme={theme} onToggle={toggleTheme} themeStyles={themeStyles} />
+            <main className={`min-h-screen flex items-center justify-center p-4 ${themeStyles.mainText}`}>
+              {renderGameStage()}
+            </main>
+          </>
         );
       };
 
 
       // --- Screen Components ---
-      const SetupScreen = ({ playerInput, setPlayerInput, traitorInput, setTraitorInput, onStartGame, error }) => {
+      const SetupScreen = ({ playerInput, setPlayerInput, traitorInput, setTraitorInput, onStartGame, error, themeStyles }) => {
         const isButtonDisabled = !!error;
+        const buttonBase = 'w-full mt-8 py-4 px-6 text-2xl font-bold rounded-lg transition-all duration-300';
+        const buttonClasses = isButtonDisabled ? themeStyles.disabledButton : `${themeStyles.primaryButton} transform hover:scale-105`;
         return (
-          <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center relative">
+          <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center relative`}>
             <h1 className="text-5xl font-bold mb-4">Traitors</h1>
-            <p className="text-slate-400 mb-8">A social deduction game of trust and betrayal.</p>
+            <p className={`${themeStyles.subtleText} mb-8`}>A social deduction game of trust and betrayal.</p>
             <div className="space-y-6">
               <div className="flex flex-col items-center">
                 <label htmlFor="players" className="text-lg font-semibold mb-2">Number of Players</label>
-                <input id="players" type="number" value={playerInput} onChange={(e) => setPlayerInput(e.target.value)} className="bg-slate-700 text-white text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <input id="players" type="number" value={playerInput} onChange={(e) => setPlayerInput(e.target.value)} className={`${themeStyles.input} text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none`} />
               </div>
               <div className="flex flex-col items-center">
                 <label htmlFor="traitors" className="text-lg font-semibold mb-2">Number of Traitors</label>
-                <input id="traitors" type="number" value={traitorInput} onChange={(e) => setTraitorInput(e.target.value)} className="bg-slate-700 text-white text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <input id="traitors" type="number" value={traitorInput} onChange={(e) => setTraitorInput(e.target.value)} className={`${themeStyles.input} text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none`} />
               </div>
             </div>
 
             {error && <p className="text-red-400 mt-4 font-semibold">{error}</p>}
-            
-            <button onClick={onStartGame} disabled={isButtonDisabled} className={`w-full mt-8 py-4 px-6 text-2xl font-bold rounded-lg transition-all duration-300 ${isButtonDisabled ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 transform hover:scale-105'}`}>
+
+            <button onClick={onStartGame} disabled={isButtonDisabled} className={`${buttonBase} ${buttonClasses}`}>
               Start Game
             </button>
           </div>
         );
       };
 
-      const RevealScreen = ({ currentPlayerIndex, playerRole, secretWord, onNext, totalPlayers }) => {
+      const RevealScreen = ({ currentPlayerIndex, playerRole, secretWord, onNext, totalPlayers, themeStyles }) => {
         const [isRevealed, setIsRevealed] = useState(false);
 
         const handleReveal = () => setIsRevealed(true);
@@ -252,19 +367,22 @@
         };
         
         const isTraitor = playerRole === Role.TRAITOR;
-        const screenColor = isTraitor ? 'bg-rose-900 animate-pulse-red' : 'bg-slate-800';
-        const textColor = isTraitor ? 'text-rose-200' : 'text-slate-200';
-        const iconColor = isTraitor ? 'text-rose-300' : 'text-slate-400';
-        const wordBgColor = isTraitor ? '' : 'bg-slate-700';
+        const screenClasses = isTraitor
+          ? `${themeStyles.traitorScreenBg} ${themeStyles.traitorScreenText}`
+          : `${themeStyles.faithfulScreenBg} ${themeStyles.faithfulScreenText}`;
+        const iconColor = isTraitor ? themeStyles.traitorIcon : themeStyles.faithfulIcon;
+        const wordBgColor = isTraitor ? '' : themeStyles.faithfulWordBg;
         const buttonText = currentPlayerIndex === totalPlayers - 1 ? "Start Discussion" : "Next Player";
+        const revealButtonClasses = `${themeStyles.primaryButton} mt-8 py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105`;
+        const nextButtonClasses = `${themeStyles.secondaryButton} mt-8 py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105`;
 
         if (!isRevealed) {
           return (
-            <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in" style={{minHeight: '400px'}}>
-              <PlayerIcon className={`w-24 h-24 text-slate-400 mb-4`} />
+            <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`} style={{minHeight: '400px'}}>
+              <PlayerIcon className={`w-24 h-24 ${themeStyles.iconPrimary} mb-4`} />
               <h2 className="text-4xl font-bold">Player {currentPlayerIndex + 1}</h2>
-              <p className="text-slate-400 text-lg mt-2">It's your turn.</p>
-              <button onClick={handleReveal} className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
+              <p className={`${themeStyles.subtleText} text-lg mt-2`}>It's your turn.</p>
+              <button onClick={handleReveal} className={revealButtonClasses}>
                 Tap to Reveal Role
               </button>
             </div>
@@ -272,7 +390,7 @@
         }
 
         return (
-          <div className={`${screenColor} ${textColor} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`} style={{minHeight: '400px'}}>
+          <div className={`${screenClasses} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`} style={{minHeight: '400px'}}>
             {isTraitor ? <TraitorIcon className={`w-24 h-24 ${iconColor} mb-4`} /> : <FaithfulIcon className={`w-24 h-24 ${iconColor} mb-4`} />}
             <p className="text-2xl">You are a</p>
             <h2 className="text-6xl font-extrabold my-2">{playerRole}</h2>
@@ -284,46 +402,71 @@
                 </div>
               </div>
             )}
-            <button onClick={handleNext} className="mt-8 bg-white/20 hover:bg-white/30 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
+            <button onClick={handleNext} className={nextButtonClasses}>
               {buttonText}
             </button>
           </div>
         );
       };
       
-      const DiscussionScreen = ({ onRevealTraitors, startingPlayer }) => (
-          <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in">
-              <PlayerIcon className="w-24 h-24 text-slate-400 mb-4" />
+      const DiscussionScreen = ({ onRevealTraitors, startingPlayer, themeStyles }) => (
+          <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`}>
+              <PlayerIcon className={`w-24 h-24 ${themeStyles.iconPrimary} mb-4`} />
               <h2 className="text-4xl font-bold mb-4">Discuss!</h2>
-              <p className="text-slate-300 text-xl mb-2">Work together to find the traitors in your midst.</p>
-              <p className="text-slate-300 text-xl mb-8">Player <span className="font-bold text-indigo-400">{startingPlayer}</span>, you go first.</p>
+              <p className={`${themeStyles.discussionSubtle} text-xl mb-2`}>Work together to find the traitors in your midst.</p>
+              <p className={`${themeStyles.discussionSubtle} text-xl mb-8`}>Player <span className={`font-bold ${themeStyles.discussionHighlight}`}>{startingPlayer}</span>, you go first.</p>
               <button onClick={onRevealTraitors} className="mt-4 bg-rose-700 hover:bg-rose-600 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
                   Reveal Traitors
               </button>
           </div>
       );
       
-      const EndScreen = ({ playerRoles, onPlayAgain }) => {
+      const EndScreen = ({ playerRoles, onPlayAgain, themeStyles }) => {
         const traitors = playerRoles.map((role, index) => ({ role, index }))
                                      .filter(p => p.role === Role.TRAITOR);
         return (
-          <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in">
+          <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`}>
             <h2 className="text-5xl font-bold mb-6">Game Over</h2>
             <div className="mb-8">
-              <h3 className="text-2xl font-semibold text-rose-400 mb-4">The Traitor{traitors.length > 1 ? 's were' : ' was'}:</h3>
+              <h3 className="text-2xl font-semibold text-rose-500 mb-4">The Traitor{traitors.length > 1 ? 's were' : ' was'}:</h3>
               <div className="flex items-center justify-center gap-6">
                 {traitors.map(traitor => (
                     <div key={traitor.index} className="flex flex-col items-center">
-                        <TraitorIcon className="w-16 h-16 text-rose-400" />
+                        <TraitorIcon className={`w-16 h-16 ${themeStyles.traitorIcon}`} />
                         <p className="mt-2 text-xl font-bold">Player {traitor.index + 1}</p>
                     </div>
                 ))}
               </div>
             </div>
-            <button onClick={onPlayAgain} className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
+            <button onClick={onPlayAgain} className={`${themeStyles.primaryButton} mt-4 py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105`}>
               Play Again
             </button>
           </div>
+        );
+      };
+
+      const ThemeToggle = ({ theme, onToggle, themeStyles }) => {
+        const isDark = theme === Theme.DARK;
+        return (
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-pressed={isDark}
+            aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+            className={`fixed top-4 right-4 z-50 p-3 rounded-full shadow-lg transition ${themeStyles.toggleButton} ${themeStyles.toggleFocus} focus:outline-none`}
+          >
+            <span className="sr-only">{`Switch to ${isDark ? 'light' : 'dark'} mode`}</span>
+            {isDark ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M12 5.25a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zm0 12a5.25 5.25 0 110-10.5 5.25 5.25 0 010 10.5z" />
+                <path d="M12 2.25a.75.75 0 01.75.75V5a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zm0 14.5a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-3.5a.75.75 0 01.75-.75zm9-4.75a.75.75 0 01-.75.75H16a.75.75 0 010-1.5h4.25a.75.75 0 01.75.75zM8.75 12a.75.75 0 01-.75.75H3.75a.75.75 0 010-1.5H8a.75.75 0 01.75.75zm10.22-5.03a.75.75 0 010 1.06l-1.768 1.768a.75.75 0 01-1.06-1.06l1.768-1.768a.75.75 0 011.06 0zM7.858 15.608a.75.75 0 010 1.06L6.09 18.436a.75.75 0 01-1.06-1.06l1.768-1.768a.75.75 0 011.06 0zm9.782 1.892a.75.75 0 01-1.06 0l-1.768-1.768a.75.75 0 011.06-1.06l1.768 1.768a.75.75 0 010 1.06zM7.15 6.553a.75.75 0 010 1.06L5.382 9.382a.75.75 0 11-1.06-1.06L6.09 6.553a.75.75 0 011.06 0z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M21.752 15.002A9.718 9.718 0 0112.002 21.75a9.75 9.75 0 01-4.98-18.155.75.75 0 01.964.964 8.25 8.25 0 009.955 9.955.75.75 0 01.964.964 9.65 9.65 0 01-.153.524z" />
+              </svg>
+            )}
+          </button>
         );
       };
 
@@ -363,12 +506,19 @@
       .animate-fade-in-fast {
         animation: fade-in-fast 0.2s ease-out forwards;
       }
-      @keyframes pulse-red {
-        0%, 100% { background-color: #7f1d1d; } /* bg-rose-900 */
-        50% { background-color: #9f1239; } /* brighter rose */
+      @keyframes pulse-red-dark {
+        0%, 100% { background-color: #7f1d1d; }
+        50% { background-color: #9f1239; }
       }
-      .animate-pulse-red {
-        animation: pulse-red 2.5s infinite ease-in-out;
+      .animate-pulse-red-dark {
+        animation: pulse-red-dark 2.5s infinite ease-in-out;
+      }
+      @keyframes pulse-red-light {
+        0%, 100% { background-color: #ffe4e6; }
+        50% { background-color: #fecdd3; }
+      }
+      .animate-pulse-red-light {
+        animation: pulse-red-light 2.5s infinite ease-in-out;
       }
     </style>
   </body>
