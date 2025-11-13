@@ -51,8 +51,6 @@
 
       // --- Gemini Service & Word Management ---
       const fetchSecretWord = (() => {
-        // High-quality, curated list of simple, concrete nouns suitable for all ages.
-        // This is the primary source for words to ensure quality and instant game starts.
         const curatedWordList = [
           'apple', 'ball', 'bed', 'bell', 'bird', 'boat', 'book', 'box', 'boy', 'bread', 'bridge', 'brush', 'bus', 'cake', 'car', 'cat', 'chair', 'clock', 'cloud', 'coat',
           'corn', 'cow', 'cup', 'dog', 'doll', 'door', 'duck', 'egg', 'eye', 'fan', 'fish', 'flag', 'floor', 'flower', 'fork', 'girl', 'glove', 'grape', 'grass',
@@ -63,19 +61,16 @@
         
         const getRandomCuratedWord = () => curatedWordList[Math.floor(Math.random() * curatedWordList.length)];
       
-        return async () => {
-          // Safely check for process.env to avoid crashing in browser environments
-          const API_KEY = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : null;
-          const ai = (API_KEY && window.GoogleGenAI) ? new window.GoogleGenAI({ apiKey: API_KEY }) : null;
-
-          if (!ai) {
+        return async (apiKey) => {
+          if (!apiKey || !window.GoogleGenAI) {
             console.log("Using built-in word list due to missing API key.");
             return getRandomCuratedWord();
           }
           
+          const ai = new window.GoogleGenAI({ apiKey });
+          
           try {
             console.log("Attempting to fetch a word from Gemini API...");
-            // The prompt is heavily guided to request a simple, child-friendly word.
             const response = await ai.models.generateContent({
               model: 'gemini-2.5-flash',
               contents: 'Generate a single, common, concrete noun that a five-year-old can understand. Examples: "car", "sun", "apple". Return only the single word in lowercase.',
@@ -83,7 +78,6 @@
             
             const word = response.text.trim().toLowerCase();
             
-            // Validate the word from the API. It must be a single, alphabetic word.
             if (word && !/\s/.test(word) && /^[a-z]+$/.test(word)) {
               console.log("Successfully fetched word from Gemini:", word);
               return word;
@@ -103,74 +97,48 @@
 
       // --- Icon Components ---
       const PlayerIcon = ({ className = "w-16 h-16" }) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className={className}
-        >
-          <path
-            fillRule="evenodd"
-            d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clipRule="evenodd" /></svg>
       );
 
       const FaithfulIcon = ({ className = "w-16 h-16" }) => (
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 24" 
-          fill="currentColor" 
-          className={className}
-        >
-          <path 
-            fillRule="evenodd" 
-            d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" 
-            clipRule="evenodd" 
-          />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clipRule="evenodd" /></svg>
       );
 
       const TraitorIcon = ({ className = "w-16 h-16" }) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className={className}
-        >
-            <path d="M12.88,2.09L12,2L11.12,2.09C9.06,2.33 7.22,3.78 6.5,5.85L6.45,6H6.38C4.2,6 2.5,7.56 2.5,9.5C2.5,11.23 3.75,12.65 5.38,12.92L5.5,13V15.5C5.5,16.88 6.63,18 8,18H9.5V21.5L10,22H14L14.5,21.5V18H16C17.38,18 18.5,16.88 18.5,15.5V13L18.63,12.92C20.25,12.65 21.5,11.23 21.5,9.5C21.5,7.56 19.81,6 17.63,6H17.55L17.5,5.85C16.78,3.78 14.94,2.33 12.88,2.09M9,9A1,1 0 0,1 10,10A1,1 0 0,1 9,11A1,1 0 0,1 8,10A1,1 0 0,1 9,9M15,9A1,1 0 0,1 16,10A1,1 0 0,1 15,11A1,1 0 0,1 14,10A1,1 0 0,1 15,9Z" />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12.88,2.09L12,2L11.12,2.09C9.06,2.33 7.22,3.78 6.5,5.85L6.45,6H6.38C4.2,6 2.5,7.56 2.5,9.5C2.5,11.23 3.75,12.65 5.38,12.92L5.5,13V15.5C5.5,16.88 6.63,18 8,18H9.5V21.5L10,22H14L14.5,21.5V18H16C17.38,18 18.5,16.88 18.5,15.5V13L18.63,12.92C20.25,12.65 21.5,11.23 21.5,9.5C21.5,7.56 19.81,6 17.63,6H17.55L17.5,5.85C16.78,3.78 14.94,2.33 12.88,2.09M9,9A1,1 0 0,1 10,10A1,1 0 0,1 9,11A1,1 0 0,1 8,10A1,1 0 0,1 9,9M15,9A1,1 0 0,1 16,10A1,1 0 0,1 15,11A1,1 0 0,1 14,10A1,1 0 0,1 15,9Z" /></svg>
+      );
+      
+      const SettingsIcon = ({ className = "w-6 h-6" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fillRule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.946 1.55l-.162.578a1.59 1.59 0 01-.53.53l-.578.162a2.04 2.04 0 00-1.55 1.946l-.002.001v.002l-.001.002c0 .917.663 1.699 1.55 1.946l.578.162c.18.05.344.15.47.28l.429.429a1.59 1.59 0 010 2.24l-.429.43a1.59 1.59 0 01-.47.28l-.578.162a2.04 2.04 0 00-1.55 1.946v.002l-.001.002-.002.001a2.04 2.04 0 001.946 1.55l.578-.162a1.59 1.59 0 01.53-.53l.429-.429a1.59 1.59 0 012.24 0l.429.429c.12.13.29.23.47.28l.578.162a2.04 2.04 0 001.55-1.946l.002-.001v-.002l.001-.002a2.04 2.04 0 00-1.946-1.55l-.578-.162a1.59 1.59 0 01-.53-.53l-.429-.429a1.59 1.59 0 010-2.24l.429-.43a1.59 1.59 0 01.47-.28l.578-.162a2.04 2.04 0 001.55-1.946l-.002-.001v-.002a2.04 2.04 0 00-1.946-1.55l-.578.162a1.59 1.59 0 01-.53.53l-.429.429a1.59 1.59 0 01-2.24 0L12.48 4.61a1.59 1.59 0 01-.47-.28l-.578-.162a2.04 2.04 0 00-1.55-1.946zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" clipRule="evenodd" /></svg>
       );
 
 
       // --- Main Application Component ---
       const App = () => {
         const [gameStage, setGameStage] = useState(GameStage.SETUP);
-        const [numPlayers, setNumPlayers] = useState(() => {
-          return parseInt(localStorage.getItem('numPlayers') || '3', 10);
-        });
-        const [numTraitors, setNumTraitors] = useState(() => {
-          return parseInt(localStorage.getItem('numTraitors') || '1', 10);
-        });
+        const [numPlayers, setNumPlayers] = useState(() => parseInt(localStorage.getItem('numPlayers') || '3', 10));
+        const [numTraitors, setNumTraitors] = useState(() => parseInt(localStorage.getItem('numTraitors') || '1', 10));
+        const [apiKey, setApiKey] = useState(() => localStorage.getItem('geminiApiKey') || '');
 
         const [secretWord, setSecretWord] = useState('');
         const [playerRoles, setPlayerRoles] = useState([]);
         const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
         const [startingPlayer, setStartingPlayer] = useState(null);
         
-        // State for setup screen inputs and validation
         const [playerInput, setPlayerInput] = useState(numPlayers.toString());
         const [traitorInput, setTraitorInput] = useState(numTraitors.toString());
         const [error, setError] = useState('');
+        const [showSettings, setShowSettings] = useState(false);
 
-        // Save settings to localStorage whenever they change
         useEffect(() => {
           localStorage.setItem('numPlayers', numPlayers.toString());
           localStorage.setItem('numTraitors', numTraitors.toString());
         }, [numPlayers, numTraitors]);
+        
+        useEffect(() => {
+            localStorage.setItem('geminiApiKey', apiKey);
+        }, [apiKey]);
 
-        // Validation logic for game settings
         useEffect(() => {
           const players = parseInt(playerInput, 10);
           const traitors = parseInt(traitorInput, 10);
@@ -180,15 +148,11 @@
             return;
           }
 
-          if (players < 3) {
-            setError('You need at least 3 players.');
-          } else if (traitors < 1) {
-            setError('You need at least 1 traitor.');
-          } else if (traitors >= players) {
-            setError('You must have fewer traitors than players.');
-          } else {
+          if (players < 3) { setError('You need at least 3 players.'); } 
+          else if (traitors < 1) { setError('You need at least 1 traitor.'); } 
+          else if (traitors >= players) { setError('You must have fewer traitors than players.'); } 
+          else {
             setError('');
-            // Only update the actual game state if the inputs are valid
             setNumPlayers(players);
             setNumTraitors(traitors);
           }
@@ -196,9 +160,9 @@
 
 
         const handleStartGame = async () => {
-          if (error) return; // Prevent starting with invalid settings
+          if (error) return;
 
-          const word = await fetchSecretWord();
+          const word = await fetchSecretWord(apiKey);
           setSecretWord(word.toUpperCase());
 
           const roles = new Array(numPlayers).fill(Role.FAITHFUL);
@@ -220,16 +184,13 @@
           if (currentPlayerIndex < numPlayers - 1) {
             setCurrentPlayerIndex(currentPlayerIndex + 1);
           } else {
-            // All roles revealed, move to discussion
             const firstPlayer = Math.floor(Math.random() * numPlayers) + 1;
             setStartingPlayer(firstPlayer);
             setGameStage(GameStage.DISCUSSION);
           }
         };
 
-        const handleRevealTraitors = () => {
-          setGameStage(GameStage.END);
-        };
+        const handleRevealTraitors = () => setGameStage(GameStage.END);
 
         const handlePlayAgain = () => {
           setGameStage(GameStage.SETUP);
@@ -237,7 +198,6 @@
           setSecretWord('');
           setCurrentPlayerIndex(0);
           setStartingPlayer(null);
-          // Keep the last valid settings for the next game
           setPlayerInput(numPlayers.toString());
           setTraitorInput(numTraitors.toString());
           setError('');
@@ -254,32 +214,15 @@
                   setTraitorInput={setTraitorInput}
                   onStartGame={handleStartGame}
                   error={error}
+                  onShowSettings={() => setShowSettings(true)}
                 />
               );
             case GameStage.REVEALING:
-              return (
-                <RevealScreen
-                  currentPlayerIndex={currentPlayerIndex}
-                  playerRole={playerRoles[currentPlayerIndex]}
-                  secretWord={secretWord}
-                  onNext={handleRevealNext}
-                  totalPlayers={numPlayers}
-                />
-              );
+              return ( <RevealScreen currentPlayerIndex={currentPlayerIndex} playerRole={playerRoles[currentPlayerIndex]} secretWord={secretWord} onNext={handleRevealNext} totalPlayers={numPlayers} /> );
             case GameStage.DISCUSSION:
-              return (
-                <DiscussionScreen 
-                  onRevealTraitors={handleRevealTraitors}
-                  startingPlayer={startingPlayer}
-                />
-              );
+              return ( <DiscussionScreen onRevealTraitors={handleRevealTraitors} startingPlayer={startingPlayer} /> );
             case GameStage.END:
-                return (
-                    <EndScreen
-                        playerRoles={playerRoles}
-                        onPlayAgain={handlePlayAgain}
-                    />
-                );
+                return ( <EndScreen playerRoles={playerRoles} onPlayAgain={handlePlayAgain} /> );
             default:
               return <div>Error: Unknown game stage.</div>;
           }
@@ -288,6 +231,7 @@
         return (
           <main className="min-h-screen flex items-center justify-center p-4">
             {renderGameStage()}
+            {showSettings && <SettingsModal apiKey={apiKey} setApiKey={setApiKey} onClose={() => setShowSettings(false)} />}
           </main>
         );
       };
@@ -295,52 +239,70 @@
 
       // --- Screen Components ---
 
-      const SetupScreen = ({ playerInput, setPlayerInput, traitorInput, setTraitorInput, onStartGame, error }) => {
+      const SettingsModal = ({ apiKey, setApiKey, onClose }) => {
+        const [localKey, setLocalKey] = useState(apiKey);
+
+        const handleSave = () => {
+            setApiKey(localKey);
+            onClose();
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in-fast">
+                <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full relative">
+                    <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-white">&times;</button>
+                    <h2 className="text-2xl font-bold mb-4">Settings</h2>
+                    <p className="text-slate-400 mb-4">
+                        Optionally, add your Google Gemini API key to generate unique secret words for each game.
+                    </p>
+                    <div className="flex flex-col">
+                        <label htmlFor="apiKey" className="text-sm font-semibold mb-2 text-slate-300">
+                            Gemini API Key
+                        </label>
+                        <input
+                            id="apiKey"
+                            type="password"
+                            value={localKey}
+                            onChange={(e) => setLocalKey(e.target.value)}
+                            placeholder="Enter your API key"
+                            className="bg-slate-700 text-white rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        />
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-sm text-indigo-400 hover:underline mt-2">
+                          Get an API key from Google AI Studio
+                        </a>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-4">
+                        <button onClick={onClose} className="bg-slate-600 hover:bg-slate-500 text-white py-2 px-4 font-bold rounded-lg">Cancel</button>
+                        <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 font-bold rounded-lg">Save</button>
+                    </div>
+                </div>
+            </div>
+        );
+      };
+
+      const SetupScreen = ({ playerInput, setPlayerInput, traitorInput, setTraitorInput, onStartGame, error, onShowSettings }) => {
         const isButtonDisabled = !!error;
         return (
-          <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center">
+          <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center relative">
+            <button onClick={onShowSettings} className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors" aria-label="Settings">
+              <SettingsIcon />
+            </button>
             <h1 className="text-5xl font-bold mb-4">Traitors</h1>
-            <p className="text-slate-400 mb-8">
-              A social deduction game of trust and betrayal.
-            </p>
+            <p className="text-slate-400 mb-8">A social deduction game of trust and betrayal.</p>
             <div className="space-y-6">
               <div className="flex flex-col items-center">
-                <label htmlFor="players" className="text-lg font-semibold mb-2">
-                  Number of Players
-                </label>
-                <input
-                  id="players"
-                  type="number"
-                  value={playerInput}
-                  onChange={(e) => setPlayerInput(e.target.value)}
-                  className="bg-slate-700 text-white text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
+                <label htmlFor="players" className="text-lg font-semibold mb-2">Number of Players</label>
+                <input id="players" type="number" value={playerInput} onChange={(e) => setPlayerInput(e.target.value)} className="bg-slate-700 text-white text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
               </div>
               <div className="flex flex-col items-center">
-                <label htmlFor="traitors" className="text-lg font-semibold mb-2">
-                  Number of Traitors
-                </label>
-                <input
-                  id="traitors"
-                  type="number"
-                  value={traitorInput}
-                  onChange={(e) => setTraitorInput(e.target.value)}
-                  className="bg-slate-700 text-white text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
+                <label htmlFor="traitors" className="text-lg font-semibold mb-2">Number of Traitors</label>
+                <input id="traitors" type="number" value={traitorInput} onChange={(e) => setTraitorInput(e.target.value)} className="bg-slate-700 text-white text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
               </div>
             </div>
 
             {error && <p className="text-red-400 mt-4 font-semibold">{error}</p>}
             
-            <button
-              onClick={onStartGame}
-              disabled={isButtonDisabled}
-              className={`w-full mt-8 py-4 px-6 text-2xl font-bold rounded-lg transition-all duration-300
-                ${isButtonDisabled 
-                  ? 'bg-slate-600 text-slate-400 cursor-not-allowed' 
-                  : 'bg-indigo-600 hover:bg-indigo-500 transform hover:scale-105'
-                }`}
-            >
+            <button onClick={onStartGame} disabled={isButtonDisabled} className={`w-full mt-8 py-4 px-6 text-2xl font-bold rounded-lg transition-all duration-300 ${isButtonDisabled ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 transform hover:scale-105'}`}>
               Start Game
             </button>
           </div>
@@ -369,10 +331,7 @@
               <PlayerIcon className={`w-24 h-24 text-slate-400 mb-4`} />
               <h2 className="text-4xl font-bold">Player {currentPlayerIndex + 1}</h2>
               <p className="text-slate-400 text-lg mt-2">It's your turn.</p>
-              <button
-                onClick={handleReveal}
-                className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105"
-              >
+              <button onClick={handleReveal} className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
                 Tap to Reveal Role
               </button>
             </div>
@@ -392,10 +351,7 @@
                 </div>
               </div>
             )}
-            <button
-              onClick={handleNext}
-              className="mt-8 bg-white/20 hover:bg-white/30 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105"
-            >
+            <button onClick={handleNext} className="mt-8 bg-white/20 hover:bg-white/30 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
               {buttonText}
             </button>
           </div>
@@ -406,16 +362,9 @@
           <div className="bg-slate-800 text-white rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in">
               <PlayerIcon className="w-24 h-24 text-slate-400 mb-4" />
               <h2 className="text-4xl font-bold mb-4">Discuss!</h2>
-              <p className="text-slate-300 text-xl mb-2">
-                  Work together to find the traitors in your midst.
-              </p>
-              <p className="text-slate-300 text-xl mb-8">
-                  Player <span className="font-bold text-indigo-400">{startingPlayer}</span>, you go first.
-              </p>
-              <button
-                  onClick={onRevealTraitors}
-                  className="mt-4 bg-rose-700 hover:bg-rose-600 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105"
-              >
+              <p className="text-slate-300 text-xl mb-2">Work together to find the traitors in your midst.</p>
+              <p className="text-slate-300 text-xl mb-8">Player <span className="font-bold text-indigo-400">{startingPlayer}</span>, you go first.</p>
+              <button onClick={onRevealTraitors} className="mt-4 bg-rose-700 hover:bg-rose-600 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
                   Reveal Traitors
               </button>
           </div>
@@ -438,10 +387,7 @@
                 ))}
               </div>
             </div>
-            <button
-              onClick={onPlayAgain}
-              className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105"
-            >
+            <button onClick={onPlayAgain} className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
               Play Again
             </button>
           </div>
@@ -476,6 +422,13 @@
       }
       .animate-fade-in {
         animation: fade-in 0.3s ease-out forwards;
+      }
+      @keyframes fade-in-fast {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .animate-fade-in-fast {
+        animation: fade-in-fast 0.2s ease-out forwards;
       }
     </style>
   </body>
