@@ -6,7 +6,8 @@
     <title>Traitors - Social Deduction Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#1e293b">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-touch-icon.svg">
     
     <!-- Load React and ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -454,6 +455,18 @@
           <App />
         </React.StrictMode>
       );
+    </script>
+    <script>
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(registration => {
+            console.log('SW registered: ', registration);
+          }).catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+          });
+        });
+      }
     </script>
     <style>
       @keyframes fade-in {

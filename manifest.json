@@ -1,0 +1,17 @@
+{
+  "name": "Traitors",
+  "short_name": "Traitors",
+  "description": "A social deduction game where faithful players must identify the hidden traitors.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
