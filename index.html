@@ -105,7 +105,7 @@
       );
 
       const TraitorIcon = ({ className = "w-16 h-16" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12.88,2.09L12,2L11.12,2.09C9.06,2.33 7.22,3.78 6.5,5.85L6.45,6H6.38C4.2,6 2.5,7.56 2.5,9.5C2.5,11.23 3.75,12.65 5.38,12.92L5.5,13V15.5C5.5,16.88 6.63,18 8,18H9.5V21.5L10,22H14L14.5,21.5V18H16C17.38,18 18.5,16.88 18.5,15.5V13L18.63,12.92C20.25,12.65 21.5,11.23 21.5,9.5C21.5,7.56 19.81,6 17.63,6H17.55L17.5,5.85C16.78,3.78 14.94,2.33 12.88,2.09M9,9A1,1 0 0,1 10,10A1,1 0 0,1 9,11A1,1 0 0,1 8,10A1,1 0 0,1 9,9M15,9A1,1 0 0,1 16,10A1,1 0 0,1 15,11A1,1 0 0,1 14,10A1,1 0 0,1 15,9Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12,2A9,9 0 0,0 3,11V22H21V11A9,9 0 0,0 12,2M8,10A2,2 0 0,1 10,12A2,2 0 0,1 8,14A2,2 0 0,1 6,12A2,2 0 0,1 8,10M16,10A2,2 0 0,1 18,12A2,2 0 0,1 16,14A2,2 0 0,1 14,12A2,2 0 0,1 16,10M12,16C14,16 15.5,14.5 15.5,12.5H8.5C8.5,14.5 10,16 12,16Z" /></svg>
       );
       
       const SettingsIcon = ({ className = "w-6 h-6" }) => (
@@ -319,7 +319,7 @@
         };
         
         const isTraitor = playerRole === Role.TRAITOR;
-        const screenColor = isTraitor ? 'bg-rose-900' : 'bg-slate-800';
+        const screenColor = isTraitor ? 'bg-rose-900 animate-pulse-red' : 'bg-slate-800';
         const textColor = isTraitor ? 'text-rose-200' : 'text-slate-200';
         const iconColor = isTraitor ? 'text-rose-300' : 'text-slate-400';
         const wordBgColor = isTraitor ? '' : 'bg-slate-700';
@@ -429,6 +429,13 @@
       }
       .animate-fade-in-fast {
         animation: fade-in-fast 0.2s ease-out forwards;
+      }
+      @keyframes pulse-red {
+        0%, 100% { background-color: #7f1d1d; } /* bg-rose-900 */
+        50% { background-color: #9f1239; } /* brighter rose */
+      }
+      .animate-pulse-red {
+        animation: pulse-red 2.5s infinite ease-in-out;
       }
     </style>
   </body>
