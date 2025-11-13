@@ -1,17 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Head Outline -->
-  <circle cx="12" cy="12" r="9"/>
-  
-  <!-- Split Line -->
-  <line x1="12" y1="3" x2="12" y2="21" />
-  
-  <!-- Left (Faithful) Eyebrow & Eye -->
-  <path d="M7.5 9.5 A 2 2 0 0 1 10.5 9.5" />
-  
-  <!-- Right (Traitor) Eyebrow & Eye -->
-  <path d="M13.5 10.5 L 16.5 9" />
-
-  <!-- Mouth -->
-  <path d="M8 15 Q 10 16 12 15" />
-  <path d="M12 15 Q 14 14 16 15" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <clipPath id="clipLeft">
+      <rect x="0" y="0" width="12" height="24" />
+    </clipPath>
+    <clipPath id="clipRight">
+      <rect x="12" y="0" width="12" height="24" />
+    </clipPath>
+    <g id="icon-shape" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <line x1="12" y1="3" x2="12" y2="21" />
+      <path d="M7.5 9.5 A 2 2 0 0 1 10.5 9.5" />
+      <path d="M13.5 10.5 L 16.5 9" />
+      <path d="M8 15 Q 10 16 12 15" />
+      <path d="M12 15 Q 14 14 16 15" />
+    </g>
+  </defs>
+  <g clip-path="url(#clipLeft)">
+    <use href="#icon-shape" stroke="#FFFFFF" fill="none" />
+  </g>
+  <g clip-path="url(#clipRight)">
+    <circle cx="12" cy="12" r="9" fill="#FFFFFF"/>
+    <use href="#icon-shape" stroke="#1e293b" fill="none" />
+  </g>
 </svg>
