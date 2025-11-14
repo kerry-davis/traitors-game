@@ -1,4 +1,5 @@
-const CACHE_NAME = 'traitors-v3';
+const CACHE_VERSION = 'v4';
+const CACHE_NAME = `traitors-${CACHE_VERSION}`;
 const urlsToCache = [
   './',
   './index.html',
@@ -33,13 +34,50 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const { request } = event;
+
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  const requestURL = new URL(request.url);
+
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(networkResponse => {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put('./index.html', responseClone));
+          return networkResponse;
+        })
+        .catch(async () => {
+          const cachedResponse = await caches.match('./index.html');
+          return cachedResponse || Response.error();
+        })
+    );
+    return;
+  }
+
+  if (requestURL.origin !== self.location.origin) {
+    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
+    caches.match(request).then(cachedResponse => {
+      const fetchPromise = fetch(request)
+        .then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
+          return networkResponse;
+        })
+        .catch(() => cachedResponse);
+
+      return cachedResponse || fetchPromise;
+    })
   );
 });
