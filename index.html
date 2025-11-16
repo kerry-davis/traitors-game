@@ -18,7 +18,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
   </head>
-  <body class="bg-slate-900">
+  <body class="bg-slate-950 text-white">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!-- Our entire application code, transpiled by Babel -->
@@ -50,52 +50,52 @@
 
       const themeConfig = {
         [Theme.DARK]: {
-          bodyClasses: ['bg-slate-900', 'text-white'],
+          bodyClasses: ['bg-slate-950', 'text-white'],
           mainText: 'text-white',
-          cardBg: 'bg-slate-800',
+          cardBg: 'bg-slate-900/70 backdrop-blur-2xl border border-slate-700/70',
           cardText: 'text-white',
           subtleText: 'text-slate-400',
-          input: 'bg-slate-700 text-white border border-transparent',
-          primaryButton: 'bg-indigo-600 hover:bg-indigo-500 text-white',
-          disabledButton: 'bg-slate-600 text-slate-400 cursor-not-allowed',
-          secondaryButton: 'bg-white/20 hover:bg-white/30 text-white',
-          iconPrimary: 'text-slate-400',
-          faithfulWordBg: 'bg-slate-700',
+          input: 'bg-slate-900/60 text-white border border-slate-700/80',
+          primaryButton: 'bg-gradient-to-r from-indigo-500 via-violet-500 to-rose-500 hover:from-indigo-400 hover:via-violet-400 hover:to-rose-400 text-white shadow-lg shadow-violet-500/40',
+          disabledButton: 'bg-slate-700 text-slate-500 cursor-not-allowed',
+          secondaryButton: 'bg-white/10 hover:bg-white/15 text-white border border-white/10',
+          iconPrimary: 'text-slate-300',
+          faithfulWordBg: 'bg-slate-900/70 border border-slate-700/80',
           discussionSubtle: 'text-slate-300',
-          discussionHighlight: 'text-indigo-400',
-          traitorScreenBg: 'bg-rose-900 animate-pulse-red-dark',
-          traitorScreenText: 'text-rose-200',
+          discussionHighlight: 'text-indigo-300',
+          traitorScreenBg: 'bg-gradient-to-br from-slate-950 via-slate-900 to-rose-900 animate-pulse-red-dark',
+          traitorScreenText: 'text-rose-100',
           traitorIcon: 'text-rose-300',
-          faithfulScreenBg: 'bg-slate-800',
-          faithfulScreenText: 'text-slate-200',
-          faithfulIcon: 'text-slate-400',
-          toggleButton: 'bg-slate-700 hover:bg-slate-600 text-white',
+          faithfulScreenBg: 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900',
+          faithfulScreenText: 'text-slate-100',
+          faithfulIcon: 'text-indigo-200',
+          toggleButton: 'bg-slate-900/80 hover:bg-slate-800 text-white border border-slate-700/80',
           toggleFocus: 'focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-900',
-          mainBackground: 'bg-slate-900',
+          mainBackground: 'bg-slate-950',
         },
         [Theme.LIGHT]: {
-          bodyClasses: ['bg-slate-100', 'text-slate-900'],
+          bodyClasses: ['bg-slate-50', 'text-slate-900'],
           mainText: 'text-slate-900',
-          cardBg: 'bg-white',
+          cardBg: 'bg-white/80 backdrop-blur-2xl border border-slate-200/80',
           cardText: 'text-slate-900',
           subtleText: 'text-slate-600',
-          input: 'bg-slate-100 text-slate-900 border border-slate-300',
-          primaryButton: 'bg-indigo-600 hover:bg-indigo-500 text-white',
-          disabledButton: 'bg-slate-300 text-slate-500 cursor-not-allowed',
-          secondaryButton: 'bg-slate-900/10 hover:bg-slate-900/20 text-slate-900',
+          input: 'bg-white/70 text-slate-900 border border-slate-200',
+          primaryButton: 'bg-gradient-to-r from-indigo-500 via-violet-500 to-rose-500 hover:from-indigo-400 hover:via-violet-400 hover:to-rose-400 text-white shadow-lg shadow-indigo-400/40',
+          disabledButton: 'bg-slate-200 text-slate-400 cursor-not-allowed',
+          secondaryButton: 'bg-slate-900/5 hover:bg-slate-900/10 text-slate-900 border border-slate-200',
           iconPrimary: 'text-slate-500',
-          faithfulWordBg: 'bg-slate-200',
+          faithfulWordBg: 'bg-slate-100 border border-slate-200',
           discussionSubtle: 'text-slate-600',
           discussionHighlight: 'text-indigo-600',
-          traitorScreenBg: 'bg-rose-100 animate-pulse-red-light',
+          traitorScreenBg: 'bg-gradient-to-br from-rose-50 via-amber-50 to-slate-50 animate-pulse-red-light',
           traitorScreenText: 'text-rose-900',
           traitorIcon: 'text-rose-600',
-          faithfulScreenBg: 'bg-white',
+          faithfulScreenBg: 'bg-gradient-to-br from-white via-slate-50 to-indigo-50',
           faithfulScreenText: 'text-slate-800',
-          faithfulIcon: 'text-slate-500',
-          toggleButton: 'bg-slate-200 hover:bg-slate-300 text-slate-900',
+          faithfulIcon: 'text-indigo-500',
+          toggleButton: 'bg-white/80 hover:bg-white text-slate-900 border border-slate-200',
           toggleFocus: 'focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-100',
-          mainBackground: 'bg-slate-100',
+          mainBackground: 'bg-slate-50',
         },
       };
 
@@ -135,30 +135,45 @@
 
 
       // --- Icon Components ---
-      const PlayerIcon = ({ className = "w-16 h-16" }) => (
+      const PlayerIcon = ({ className = "w-20 h-20" }) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clipRule="evenodd" /></svg>
       );
 
-      const FaithfulIcon = ({ className = "w-16 h-16" }) => (
+      const FaithfulIcon = ({ className = "w-20 h-20" }) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clipRule="evenodd" /></svg>
       );
 
-      const TraitorIcon = ({ className = "w-16 h-16" }) => (
+      const TraitorIcon = ({ className = "w-20 h-20" }) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12,2A9,9 0 0,0 3,11V22H21V11A9,9 0 0,0 12,2M8,10A2,2 0 0,1 10,12A2,2 0 0,1 8,14A2,2 0 0,1 6,12A2,2 0 0,1 8,10M16,10A2,2 0 0,1 18,12A2,2 0 0,1 16,14A2,2 0 0,1 14,12A2,2 0 0,1 16,10M12,16C14,16 15.5,14.5 15.5,12.5H8.5C8.5,14.5 10,16 12,16Z" /></svg>
+      );
+
+      // --- Animated Border Wrapper (inspired by iCodeThis #319) ---
+      const AnimatedBorder = ({ children, className = "" }) => (
+        <div className={`ab-wrapper ${className}`}>
+          <div className="relative z-10">
+            {children}
+          </div>
+          <span className="ab-line ab-line-top" aria-hidden="true" />
+          <span className="ab-line ab-line-right" aria-hidden="true" />
+          <span className="ab-line ab-line-bottom" aria-hidden="true" />
+          <span className="ab-line ab-line-left" aria-hidden="true" />
+        </div>
+      );
+      
+      // --- Decorative Background ---
+      const AnimatedBackdrop = ({ theme }) => (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.14),_transparent_60%),radial-gradient(circle_at_bottom,_rgba(129,140,248,0.18),_transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(15,23,42,0.7),_transparent_70%)] mix-blend-multiply" />
+          <div className={`absolute -top-40 -right-28 h-80 w-80 rounded-full blur-3xl opacity-70 mix-blend-screen animate-orb-slow ${theme === Theme.DARK ? 'bg-indigo-500/70' : 'bg-indigo-300/80'}`} />
+          <div className={`absolute -bottom-40 -left-24 h-96 w-96 rounded-full blur-3xl opacity-70 mix-blend-screen animate-orb-slower ${theme === Theme.DARK ? 'bg-rose-500/70' : 'bg-rose-300/80'}`} />
+          <div className="absolute inset-0 bg-grid-soft opacity-40" />
+        </div>
       );
       
       // --- Main Application Component ---
-      const THEME_STORAGE_KEY = 'traitors-theme';
-
       const App = () => {
-        const [theme, setTheme] = useState(() => {
-          try {
-            const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-            return storedTheme === Theme.LIGHT ? Theme.LIGHT : Theme.DARK;
-          } catch (error) {
-            return Theme.DARK;
-          }
-        });
+        const [theme, setTheme] = useState(Theme.DARK);
 
         const themeStyles = themeConfig[theme];
 
@@ -176,12 +191,6 @@
         const [error, setError] = useState('');
 
         useEffect(() => {
-          try {
-            localStorage.setItem(THEME_STORAGE_KEY, theme);
-          } catch (error) {
-            // ignored
-          }
-
           const classList = document.body.classList;
           const classesToRemove = new Set();
           Object.values(themeConfig).forEach(config => {
@@ -289,6 +298,7 @@
                   onStartGame={handleStartGame}
                   error={error}
                   themeStyles={themeStyles}
+                  theme={theme}
                 />
               );
             case GameStage.REVEALING:
@@ -300,6 +310,7 @@
                   onNext={handleRevealNext}
                   totalPlayers={numPlayers}
                   themeStyles={themeStyles}
+                  theme={theme}
                 />
               );
             case GameStage.DISCUSSION:
@@ -320,44 +331,120 @@
         return (
           <>
             <ThemeToggle theme={theme} onToggle={toggleTheme} themeStyles={themeStyles} />
-            <main className={`min-h-screen flex items-center justify-center p-4 ${themeStyles.mainText}`}>
-              {renderGameStage()}
-            </main>
+            <div className={`relative min-h-screen flex items-center justify-center px-4 py-10 ${themeStyles.mainBackground}`}>
+              <AnimatedBackdrop theme={theme} />
+              <main className="relative z-10 w-full max-w-3xl">
+                {renderGameStage()}
+              </main>
+            </div>
           </>
         );
       };
 
 
       // --- Screen Components ---
-      const SetupScreen = ({ playerInput, setPlayerInput, traitorInput, setTraitorInput, onStartGame, error, themeStyles }) => {
+      const SetupScreen = ({ playerInput, setPlayerInput, traitorInput, setTraitorInput, onStartGame, error, themeStyles, theme }) => {
         const isButtonDisabled = !!error;
-        const buttonBase = 'w-full mt-8 py-4 px-6 text-2xl font-bold rounded-lg transition-all duration-300';
-        const buttonClasses = isButtonDisabled ? themeStyles.disabledButton : `${themeStyles.primaryButton} transform hover:scale-105`;
+        const buttonBase = 'w-full mt-10 py-4 px-6 text-2xl font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-black/40';
+        const buttonClasses = isButtonDisabled ? themeStyles.disabledButton : `${themeStyles.primaryButton} transform hover:scale-[1.03] active:scale-[0.99]`;
+        const isDark = theme === Theme.DARK;
+        const titleClasses = isDark
+          ? 'bg-gradient-to-r from-indigo-300 via-sky-200 to-rose-300 bg-clip-text text-transparent'
+          : 'bg-gradient-to-r from-indigo-700 via-violet-700 to-rose-600 bg-clip-text text-transparent drop-shadow-sm';
         return (
-          <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center relative`}>
-            <h1 className="text-5xl font-bold mb-4">Traitors</h1>
-            <p className={`${themeStyles.subtleText} mb-8`}>A social deduction game of trust and betrayal.</p>
-            <div className="space-y-6">
-              <div className="flex flex-col items-center">
-                <label htmlFor="players" className="text-lg font-semibold mb-2">Number of Players</label>
-                <input id="players" type="number" value={playerInput} onChange={(e) => setPlayerInput(e.target.value)} className={`${themeStyles.input} text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none`} />
-              </div>
-              <div className="flex flex-col items-center">
-                <label htmlFor="traitors" className="text-lg font-semibold mb-2">Number of Traitors</label>
-                <input id="traitors" type="number" value={traitorInput} onChange={(e) => setTraitorInput(e.target.value)} className={`${themeStyles.input} text-2xl font-bold rounded-md text-center w-32 p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none`} />
-              </div>
-            </div>
+          <div className="relative w-full max-w-2xl mx-auto">
+            <div
+              className="absolute -inset-[1px] rounded-[2rem] bg-gradient-to-tr from-indigo-500/70 via-violet-500/60 to-rose-500/80 opacity-70 blur-2xl animate-card-glow"
+              aria-hidden="true"
+            />
+            <AnimatedBorder
+              className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-[2rem] px-8 py-10 shadow-2xl w-full text-center overflow-hidden`}
+            >
+              <div
+                className="pointer-events-none absolute inset-x-10 -top-32 h-40 bg-gradient-to-r from-indigo-500/40 via-sky-400/10 to-rose-500/40 opacity-70 blur-3xl"
+                aria-hidden="true"
+              />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 dark:bg-black/50 text-xs font-semibold uppercase tracking-[0.2em] mb-5 shadow-sm shadow-black/40 text-slate-100">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Live table game
+                </div>
+                <h1 className="text-5xl sm:text-6xl font-extrabold mb-3 tracking-tight">
+                  <span className={titleClasses}>
+                    Traitors
+                  </span>
+                </h1>
+                <p className={`${themeStyles.subtleText} mb-8 text-base sm:text-lg max-w-xl mx-auto`}>
+                  Host a cinematic social deduction round in seconds. Reveal secret roles, whisper clues, and see who walks away unmasked.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
+                  <div className="space-y-3">
+                    <label
+                      htmlFor="players"
+                      className={`text-sm font-semibold tracking-wide uppercase ${themeStyles.subtleText} opacity-90`}
+                    >
+                      Number of Players
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="players"
+                        type="number"
+                        value={playerInput}
+                        onChange={(e) => setPlayerInput(e.target.value)}
+                        className={`${themeStyles.input} text-2xl font-bold rounded-2xl text-center w-full py-3 focus:ring-2 focus:ring-indigo-400 focus:outline-none transition-shadow`}
+                      />
+                      <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center text-xs uppercase tracking-[0.2em] ${themeStyles.subtleText} opacity-80`}>
+                        seats
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <label
+                      htmlFor="traitors"
+                      className={`text-sm font-semibold tracking-wide uppercase ${themeStyles.subtleText} opacity-90`}
+                    >
+                      Number of Traitors
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="traitors"
+                        type="number"
+                        value={traitorInput}
+                        onChange={(e) => setTraitorInput(e.target.value)}
+                        className={`${themeStyles.input} text-2xl font-bold rounded-2xl text-center w-full py-3 focus:ring-2 focus:ring-indigo-400 focus:outline-none transition-shadow`}
+                      />
+                      <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center text-xs uppercase tracking-[0.2em] ${themeStyles.subtleText} opacity-80`}>
+                        hidden
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            {error && <p className="text-red-400 mt-4 font-semibold">{error}</p>}
+                {error && <p className="text-rose-400 mt-5 font-semibold text-sm sm:text-base">{error}</p>}
 
-            <button onClick={onStartGame} disabled={isButtonDisabled} className={`${buttonBase} ${buttonClasses}`}>
-              Start Game
-            </button>
+                <button onClick={onStartGame} disabled={isButtonDisabled} className={`${buttonBase} ${buttonClasses}`}>
+                  Begin Role Reveal
+                </button>
+
+                <div className={`mt-6 flex flex-wrap items-center justify-center gap-3 text-sm sm:text-base ${themeStyles.subtleText} opacity-80`}>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                    No accounts or logins
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    Perfect for in-person groups
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                    New word every round
+                  </span>
+                </div>
+              </AnimatedBorder>
           </div>
         );
       };
 
-      const RevealScreen = ({ currentPlayerIndex, playerRole, secretWord, onNext, totalPlayers, themeStyles }) => {
+      const RevealScreen = ({ currentPlayerIndex, playerRole, secretWord, onNext, totalPlayers, themeStyles, theme }) => {
         const [isRevealed, setIsRevealed] = useState(false);
 
         const handleReveal = () => setIsRevealed(true);
@@ -367,80 +454,215 @@
         };
         
         const isTraitor = playerRole === Role.TRAITOR;
+        const isDarkTheme = theme === Theme.DARK;
         const screenClasses = isTraitor
           ? `${themeStyles.traitorScreenBg} ${themeStyles.traitorScreenText}`
           : `${themeStyles.faithfulScreenBg} ${themeStyles.faithfulScreenText}`;
         const iconColor = isTraitor ? themeStyles.traitorIcon : themeStyles.faithfulIcon;
         const wordBgColor = isTraitor ? '' : themeStyles.faithfulWordBg;
         const buttonText = currentPlayerIndex === totalPlayers - 1 ? "Start Discussion" : "Next Player";
-        const revealButtonClasses = `${themeStyles.primaryButton} mt-8 py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105`;
-        const nextButtonClasses = `${themeStyles.secondaryButton} mt-8 py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105`;
+        const revealButtonClasses = `${themeStyles.primaryButton} mt-8 py-3 px-8 text-2xl font-semibold rounded-2xl transition-transform transform hover:scale-[1.03] active:scale-[0.99]`;
+        const nextButtonClasses = `${themeStyles.secondaryButton} mt-8 py-3 px-8 text-2xl font-semibold rounded-2xl transition-transform transform hover:scale-[1.03] active:scale-[0.99]`;
+
+        const secretPillClasses = `inline-flex items-center gap-3 px-4 py-1.5 rounded-full text-xs sm:text-sm uppercase tracking-[0.25em] ${
+          isDarkTheme ? 'bg-black/30 text-slate-100' : 'bg-slate-900/80 text-slate-50'
+        }`;
 
         if (!isRevealed) {
           return (
-            <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`} style={{minHeight: '400px'}}>
-              <PlayerIcon className={`w-24 h-24 ${themeStyles.iconPrimary} mb-4`} />
-              <h2 className="text-4xl font-bold">Player {currentPlayerIndex + 1}</h2>
-              <p className={`${themeStyles.subtleText} text-lg mt-2`}>It's your turn.</p>
-              <button onClick={handleReveal} className={revealButtonClasses}>
-                Tap to Reveal Role
-              </button>
+            <div className="relative max-w-lg w-full mx-auto">
+              <div
+                className="absolute -inset-[1px] rounded-[1.75rem] bg-gradient-to-tr from-indigo-500/70 via-sky-500/60 to-emerald-400/60 opacity-60 blur-2xl animate-card-glow"
+                aria-hidden="true"
+              />
+              <AnimatedBorder
+                className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-[1.75rem] px-6 py-6 sm:px-8 sm:py-7 shadow-2xl w-full text-center flex flex-col items-center justify-center animate-fade-in overflow-hidden`}
+                style={{ minHeight: '260px' }}
+              >
+                <div
+                  className="pointer-events-none absolute inset-x-8 -top-20 h-32 bg-gradient-to-r from-indigo-500/40 via-sky-400/20 to-emerald-400/40 opacity-60 blur-3xl"
+                  aria-hidden="true"
+                />
+                  <PlayerIcon className={`w-20 h-20 mx-auto ${themeStyles.iconPrimary} mb-4 drop-shadow-xl`} />
+                  <p className={`${themeStyles.subtleText} text-base sm:text-lg uppercase tracking-[0.25em] mb-1.5`}>
+                    Seat {currentPlayerIndex + 1}
+                  </p>
+                  <h2 className="text-2xl sm:text-3xl font-semibold">Cover the screen.</h2>
+                  <p className={`${themeStyles.subtleText} text-lg sm:text-xl mt-1`}>
+                    Only this player should see the next screen.
+                  </p>
+                  <button onClick={handleReveal} className={revealButtonClasses}>
+                    Tap to Reveal Role
+                  </button>
+              </AnimatedBorder>
             </div>
           );
         }
 
         return (
-          <div className={`${screenClasses} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`} style={{minHeight: '400px'}}>
-            {isTraitor ? <TraitorIcon className={`w-24 h-24 ${iconColor} mb-4`} /> : <FaithfulIcon className={`w-24 h-24 ${iconColor} mb-4`} />}
-            <p className="text-2xl">You are a</p>
-            <h2 className="text-6xl font-extrabold my-2">{playerRole}</h2>
-            {!isTraitor && (
-              <div className="mt-4">
-                <p className="text-lg">The secret word is:</p>
-                <div className={`mt-2 ${wordBgColor} rounded-md px-6 py-2`}>
-                  <p className="text-4xl font-bold tracking-widest">{secretWord}</p>
+          <div className="relative max-w-xl w-full mx-auto">
+            <div
+              className="absolute -inset-[1px] rounded-[2rem] bg-gradient-to-tr from-rose-500/70 via-amber-400/60 to-indigo-500/70 opacity-70 blur-2xl animate-card-glow"
+              aria-hidden="true"
+            />
+            <AnimatedBorder
+              className={`${screenClasses} rounded-[2rem] px-8 py-8 sm:p-10 shadow-2xl max-w-xl w-full text-center flex flex-col items-center justify-center animate-fade-in overflow-hidden`}
+              style={{ minHeight: '380px' }}
+            >
+              <div
+                className="pointer-events-none absolute inset-x-10 -top-24 h-40 bg-gradient-to-r from-rose-500/40 via-amber-300/20 to-indigo-500/40 opacity-70 blur-3xl"
+                aria-hidden="true"
+              />
+              <div className="relative z-10 space-y-4">
+                <div className={secretPillClasses}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+                  Secret role
                 </div>
+                {isTraitor ? (
+                  <TraitorIcon className={`w-20 h-20 ${iconColor} mx-auto drop-shadow-[0_0_60px_rgba(248,113,113,0.55)]`} />
+                ) : (
+                  <FaithfulIcon className={`w-20 h-20 ${iconColor} mx-auto drop-shadow-[0_0_60px_rgba(129,140,248,0.6)]`} />
+                )}
+                <div className="space-y-2">
+                  <p className="text-base sm:text-lg font-medium opacity-90">You are a</p>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                    <span
+                      className={
+                        isDarkTheme
+                          ? 'bg-gradient-to-r from-slate-50 via-amber-100 to-rose-100 bg-clip-text text-transparent drop-shadow-md'
+                          : 'text-slate-900 drop-shadow-sm'
+                      }
+                    >
+                      {playerRole}
+                    </span>
+                  </h2>
+                </div>
+                {!isTraitor && (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-xs sm:text-sm uppercase tracking-[0.2em] opacity-80">Your shared clue</p>
+                    <div
+                      className={`mt-1 inline-flex items-center justify-center px-8 py-3 rounded-2xl ${wordBgColor} shadow-inner shadow-black/40`}
+                    >
+                      <p className="text-2xl sm:text-3xl font-bold tracking-[0.35em]">{secretWord}</p>
+                    </div>
+                    <p className="text-base sm:text-lg opacity-80 max-w-sm mx-auto">
+                      Describe this without saying the word. Traitors must fake it.
+                    </p>
+                  </div>
+                )}
+                {isTraitor && (
+                  <p className="text-base sm:text-lg opacity-90 max-w-sm mx-auto">
+                    Blend in. Ask sharp questions. Push suspicion away from yourself.
+                  </p>
+                )}
+                <button onClick={handleNext} className={nextButtonClasses}>
+                  {buttonText}
+                </button>
               </div>
-            )}
-            <button onClick={handleNext} className={nextButtonClasses}>
-              {buttonText}
-            </button>
+            </AnimatedBorder>
           </div>
         );
       };
       
       const DiscussionScreen = ({ onRevealTraitors, startingPlayer, themeStyles }) => (
-          <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`}>
-              <PlayerIcon className={`w-24 h-24 ${themeStyles.iconPrimary} mb-4`} />
-              <h2 className="text-4xl font-bold mb-4">Discuss!</h2>
-              <p className={`${themeStyles.discussionSubtle} text-xl mb-2`}>Work together to find the traitors in your midst.</p>
-              <p className={`${themeStyles.discussionSubtle} text-xl mb-8`}>Player <span className={`font-bold ${themeStyles.discussionHighlight}`}>{startingPlayer}</span>, you go first.</p>
-              <button onClick={onRevealTraitors} className="mt-4 bg-rose-700 hover:bg-rose-600 text-white py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105">
-                  Reveal Traitors
+        <div className="relative max-w-2xl w-full mx-auto">
+          <div
+            className="absolute -inset-[1px] rounded-[2rem] bg-gradient-to-tr from-indigo-500/70 via-violet-500/60 to-rose-500/80 opacity-70 blur-2xl animate-card-glow"
+            aria-hidden="true"
+          />
+          <AnimatedBorder
+            className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-[2rem] px-8 py-8 sm:p-10 shadow-2xl max-w-2xl w-full text-center flex flex-col items-center justify-center animate-fade-in overflow-hidden`}
+          >
+            <div
+              className="pointer-events-none absolute inset-x-10 -top-24 h-40 bg-gradient-to-r from-indigo-500/40 via-sky-400/20 to-rose-500/40 opacity-70 blur-3xl"
+              aria-hidden="true"
+            />
+            <div className="relative z-10 space-y-5">
+              <PlayerIcon className={`w-20 h-20 ${themeStyles.iconPrimary} mx-auto mb-2 drop-shadow-xl`} />
+              <h2 className="text-3xl sm:text-4xl font-extrabold mb-2">Discussion Phase</h2>
+              <p className={`${themeStyles.discussionSubtle} text-lg sm:text-xl`}>
+                Work together, read the table, and chase every raised eyebrow. Traitors will be trying to disappear into the crowd.
+              </p>
+              <p className={`${themeStyles.discussionSubtle} text-xl sm:text-2xl`}>
+                <span className="opacity-75 mr-1">First to speak:</span>
+                <span className={`font-bold text-2xl sm:text-3xl ${themeStyles.discussionHighlight}`}>Player {startingPlayer}</span>
+              </p>
+              <div className={`mt-6 grid grid-cols-1 sm:grid-cols-3 gap-5 text-left ${themeStyles.discussionSubtle} opacity-90`}>
+                <div className="rounded-xl bg-black/25 px-4 py-4 border border-white/10 space-y-2">
+                  <p className="text-base sm:text-lg font-semibold mb-1">Faithful</p>
+                  <p className="text-base sm:text-lg">
+                    Explain your thinking out loud. Traitors hate specific timelines and details.
+                  </p>
+                </div>
+                <div className="rounded-xl bg-black/25 px-4 py-4 border border-white/10 space-y-2">
+                  <p className="text-base sm:text-lg font-semibold mb-1">Traitors</p>
+                  <p className="text-base sm:text-lg">
+                    Echo real players, not each other. Push suspicion gently, never all at once.
+                  </p>
+                </div>
+                <div className="rounded-xl bg-black/25 px-4 py-4 border border-white/10 space-y-2">
+                  <p className="text-base sm:text-lg font-semibold mb-1">Group</p>
+                  <p className="text-base sm:text-lg">
+                    Vote only when you're ready. Once the reveal happens, there's no going back.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={onRevealTraitors}
+                className="mt-6 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white py-3 px-8 text-2xl font-semibold rounded-2xl transition-transform transform hover:scale-[1.03] active:scale-[0.99] shadow-lg shadow-rose-500/40"
+              >
+                Reveal Traitors
               </button>
-          </div>
+            </div>
+          </AnimatedBorder>
+        </div>
       );
       
       const EndScreen = ({ playerRoles, onPlayAgain, themeStyles }) => {
         const traitors = playerRoles.map((role, index) => ({ role, index }))
                                      .filter(p => p.role === Role.TRAITOR);
         return (
-          <div className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-lg p-8 shadow-2xl max-w-md w-full text-center flex flex-col items-center justify-center animate-fade-in`}>
-            <h2 className="text-5xl font-bold mb-6">Game Over</h2>
-            <div className="mb-8">
-              <h3 className="text-2xl font-semibold text-rose-500 mb-4">The Traitor{traitors.length > 1 ? 's were' : ' was'}:</h3>
-              <div className="flex items-center justify-center gap-6">
-                {traitors.map(traitor => (
-                    <div key={traitor.index} className="flex flex-col items-center">
-                        <TraitorIcon className={`w-16 h-16 ${themeStyles.traitorIcon}`} />
-                        <p className="mt-2 text-xl font-bold">Player {traitor.index + 1}</p>
-                    </div>
-                ))}
+          <div className="relative max-w-2xl w-full mx-auto">
+            <div
+              className="absolute -inset-[1px] rounded-[2rem] bg-gradient-to-tr from-rose-500/80 via-amber-400/70 to-indigo-500/80 opacity-80 blur-2xl animate-card-glow"
+              aria-hidden="true"
+            />
+            <AnimatedBorder
+              className={`${themeStyles.cardBg} ${themeStyles.cardText} rounded-[2rem] px-8 py-8 sm:p-10 shadow-2xl max-w-2xl w-full text-center flex flex-col items-center justify-center animate-fade-in overflow-hidden`}
+            >
+              <div
+                className="pointer-events-none absolute inset-x-10 -top-24 h-40 bg-gradient-to-r from-rose-500/40 via-amber-300/20 to-indigo-500/40 opacity-80 blur-3xl"
+                aria-hidden="true"
+              />
+              <div className="relative z-10 w-full space-y-4">
+                <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 tracking-tight">The Masks Drop</h2>
+                <p className="text-base sm:text-lg opacity-80 mb-8 max-w-lg mx-auto">
+                  The round is over. Compare your suspicions with reality and decide who earned your trust—and who never should again.
+                </p>
+                <div className="mb-8">
+                  <h3 className="text-2xl font-semibold text-rose-400 mb-4">
+                    The Traitor{traitors.length > 1 ? 's were' : ' was'}:
+                  </h3>
+                  <div className="flex flex-wrap items-center justify-center gap-8">
+                    {traitors.map(traitor => (
+                      <div key={traitor.index} className="flex flex-col items-center">
+                        <div className="relative">
+                          <div className="absolute -inset-3 rounded-full bg-rose-500/40 blur-2xl" aria-hidden="true" />
+                          <TraitorIcon className={`w-20 h-20 ${themeStyles.traitorIcon} relative drop-shadow-[0_0_45px_rgba(248,113,113,0.75)]`} />
+                        </div>
+                        <p className="mt-3 text-lg sm:text-xl font-bold">Player {traitor.index + 1}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  onClick={onPlayAgain}
+                  className={`${themeStyles.primaryButton} mt-4 py-3 px-8 text-2xl font-semibold rounded-2xl transition-transform transform hover:scale-[1.03] active:scale-[0.99]`}
+                >
+                  Start New Round
+                </button>
               </div>
-            </div>
-            <button onClick={onPlayAgain} className={`${themeStyles.primaryButton} mt-4 py-3 px-8 text-xl font-bold rounded-lg transition-transform transform hover:scale-105`}>
-              Play Again
-            </button>
+            </AnimatedBorder>
           </div>
         );
       };
@@ -519,6 +741,105 @@
       }
       .animate-pulse-red-light {
         animation: pulse-red-light 2.5s infinite ease-in-out;
+      }
+
+      /* Animated border, inspired by iCodeThis "Animated Input Border" */
+      .ab-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.75rem;
+      }
+      .ab-line {
+        position: absolute;
+        pointer-events: none;
+        background: linear-gradient(90deg, transparent, rgba(129,140,248,0.9), rgba(56,189,248,0.95), rgba(244,114,182,0.95), transparent);
+        filter: drop-shadow(0 0 12px rgba(56,189,248,0.7));
+      }
+      body[data-theme="light"] .ab-line {
+        background: linear-gradient(90deg, transparent, rgba(37,99,235,1), rgba(79,70,229,1), rgba(236,72,153,1), transparent);
+        filter: drop-shadow(0 0 18px rgba(79,70,229,0.9));
+      }
+      .ab-line-top {
+        top: 0;
+        left: -40%;
+        width: 40%;
+        height: 2px;
+        animation: ab-top 3s linear infinite;
+      }
+      .ab-line-right {
+        top: -40%;
+        right: 0;
+        width: 2px;
+        height: 40%;
+        animation: ab-right 3s linear infinite;
+        animation-delay: 0.75s;
+      }
+      .ab-line-bottom {
+        bottom: 0;
+        right: -40%;
+        width: 40%;
+        height: 2px;
+        animation: ab-bottom 3s linear infinite;
+        animation-delay: 1.5s;
+      }
+      .ab-line-left {
+        bottom: -40%;
+        left: 0;
+        width: 2px;
+        height: 40%;
+        animation: ab-left 3s linear infinite;
+        animation-delay: 2.25s;
+      }
+      @keyframes ab-top {
+        0% { transform: translateX(0); opacity: 0; }
+        10% { opacity: 1; }
+        100% { transform: translateX(260%); opacity: 0; }
+      }
+      @keyframes ab-right {
+        0% { transform: translateY(0); opacity: 0; }
+        10% { opacity: 1; }
+        100% { transform: translateY(260%); opacity: 0; }
+      }
+      @keyframes ab-bottom {
+        0% { transform: translateX(0); opacity: 0; }
+        10% { opacity: 1; }
+        100% { transform: translateX(-260%); opacity: 0; }
+      }
+      @keyframes ab-left {
+        0% { transform: translateY(0); opacity: 0; }
+        10% { opacity: 1; }
+        100% { transform: translateY(-260%); opacity: 0; }
+      }
+
+      @keyframes orb-slow {
+        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(20px, -40px, 0) scale(1.15); }
+      }
+      .animate-orb-slow {
+        animation: orb-slow 18s ease-in-out infinite;
+      }
+
+      @keyframes orb-slower {
+        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(-24px, 32px, 0) scale(1.1); }
+      }
+      .animate-orb-slower {
+        animation: orb-slower 22s ease-in-out infinite;
+      }
+
+      @keyframes card-glow {
+        0%, 100% { opacity: 0.55; filter: blur(32px); }
+        50% { opacity: 0.9; filter: blur(40px); }
+      }
+      .animate-card-glow {
+        animation: card-glow 14s ease-in-out infinite;
+      }
+
+      .bg-grid-soft {
+        background-image:
+          linear-gradient(to right, rgba(148, 163, 184, 0.16) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(148, 163, 184, 0.16) 1px, transparent 1px);
+        background-size: 40px 40px;
       }
     </style>
   </body>
