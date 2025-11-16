@@ -578,8 +578,7 @@
               aria-hidden="true"
             />
             <div className="relative z-10 space-y-5">
-              <PlayerIcon className={`w-20 h-20 ${themeStyles.iconPrimary} mx-auto mb-2 drop-shadow-xl`} />
-              <h2 className="text-3xl sm:text-4xl font-extrabold mb-2">Discussion Phase</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold">Discussion Phase</h2>
               <p className={`${themeStyles.discussionSubtle} text-lg sm:text-xl`}>
                 Share quick clues and reactions, and watch how everyone responds.
               </p>
@@ -587,7 +586,7 @@
                 <span className="opacity-75 mr-1">First to speak:</span>
                 <span className={`font-bold text-2xl sm:text-3xl ${themeStyles.discussionHighlight}`}>Player {startingPlayer}</span>
               </p>
-              <div className={`mt-6 grid grid-cols-1 sm:grid-cols-3 gap-5 text-left ${themeStyles.discussionSubtle} opacity-90`}>
+              <div className={`mt-4 grid grid-cols-1 sm:grid-cols-3 gap-5 text-left ${themeStyles.discussionSubtle} opacity-90`}>
                 <div className="rounded-xl bg-black/25 px-4 py-4 border border-white/10 space-y-2">
                   <p className="text-base sm:text-lg font-semibold mb-1">Faithful</p>
                   <p className="text-base sm:text-lg">
@@ -609,7 +608,7 @@
               </div>
               <button
                 onClick={onRevealTraitors}
-                className="mt-6 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white py-3 px-8 text-2xl font-semibold rounded-2xl transition-transform transform hover:scale-[1.03] active:scale-[0.99] shadow-lg shadow-rose-500/40"
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white py-3 px-8 text-2xl font-semibold rounded-2xl transition-transform transform hover:scale-[1.03] active:scale-[0.99] shadow-lg shadow-rose-500/40"
               >
                 Reveal Traitors
               </button>
